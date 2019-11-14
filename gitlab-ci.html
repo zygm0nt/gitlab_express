@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Gitlab pipeline statuses</title>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<meta http-equiv="refresh" content="10" />
+<link rel="icon" type="image/x-icon" href="favicon.png" />
+
+<style>
+</style>
+    </head>
+    <body>
+
+        <img src="linkedin_banner_image_1.png" height="100"/>
+
+        <div id="container">
+
+        </div>
+
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <script src="config.js"></script>
+<script>
+$(document).tooltip({ 
+  content: function(callback) { 
+     callback($(this).prop('title').replace(' | ', '<br />')); 
+  }
+}).ready(function() {
+
+    function ico(name, color) {
+        return "<i class=\"material-icons\" style=\"color:" + color + "\">" + name + "</i>";
+    }
+
+    function get_image(status) {
+        if (status == 'success') {
+            return ico("check_circle_outline", "green");
+        } else if (status == 'running') {
+            return ico("av_timer", "gray");
+        } else {
+            return ico("error_outline", "red");
+        } 
+    }
+
+    function create_tooltip(elem) {
+        return  elem['updated_at'] + " <br/><b> " + elem['ref'] + "</b><br/>" + elem['id'];
+    }
+
+    function process_statuses(data, elem_id) {
+        $.each(data, function (idx, elem) {
+            $("#" + elem_id).append("<a href=\"" + elem['web_url']+ "\" title=\"" + create_tooltip(elem) + "\">" + get_image(elem['status']) + "</a>");
+        });
+    }
+
+    $.each( projectUris, function( index, value ){
+        $.ajax({
+            url: urlTemplate.replace("XXX", value.replace("/", "%2F")), 
+            headers: {"PRIVATE-TOKEN": PrivateToken}
+        }).done(function( data ) {
+            data.reverse();
+            $( "#container" ).append( "<tr><td>" + value + "</td><td><span id=\"pInfo" + index + "\"></span></td></tr>" );
+            process_statuses(data, "pInfo" + index);
+        });
+    });
+});
+</script>
+    </body>
+</html>
