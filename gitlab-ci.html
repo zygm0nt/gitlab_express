@@ -56,12 +56,12 @@ $(document).tooltip({
     }
 
     $.each( projectUris, function( index, value ){
+        $( "#container" ).append( "<tr><td>" + value + "</td><td><span id=\"pInfo" + index + "\"></span></td></tr>" );
         $.ajax({
             url: urlTemplate.replace("XXX", value.replace("/", "%2F")), 
             headers: {"PRIVATE-TOKEN": PrivateToken}
         }).done(function( data ) {
             data.reverse();
-            $( "#container" ).append( "<tr><td>" + value + "</td><td><span id=\"pInfo" + index + "\"></span></td></tr>" );
             process_statuses(data, "pInfo" + index);
         });
     });
